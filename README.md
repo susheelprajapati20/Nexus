@@ -9,6 +9,14 @@ npm install
 npm run dev
 ```
 
+## Public Host
+
+```
+https://biomathnexus.netlify.app
+```
+
+
+
 ## Checks
 
 ```powershell
