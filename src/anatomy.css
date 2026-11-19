@@ -1,0 +1,36 @@
+.nx-atlas-plate {display:block;width:100%;height:100%;overflow:visible}
+.nx-atlas-leader path {fill:none;stroke:#a7c8ad;stroke-width:.9;opacity:.68}
+.nx-atlas-leader circle {fill:#e7c88e;stroke:#375c54;stroke-width:1.2}
+.nx-atlas-leader text,.nx-atlas-microtext text,.nx-atlas-meter {font:600 12px/1.2 ui-monospace,Consolas,monospace;fill:#e4efdf;letter-spacing:.02em}
+.nx-atlas-plate .nx-atlas-leader text {font-size:14px;letter-spacing:.03em}
+.nx-atlas {--nx-text:#eaf1df;display:flex;flex-direction:column;overflow:hidden;background-color:#163d36;background-image:linear-gradient(#a9dbc210 1px,transparent 1px),linear-gradient(90deg,#a9dbc210 1px,transparent 1px),radial-gradient(ellipse at 50% 31%,#31554a 0%,#173e38 51%,#12342e 90%);background-size:24px 24px,24px 24px,100% 100%;border-radius:14px;color:var(--nx-text);border:1px solid #31584b;isolation:isolate;min-width:0}
+.nx-atlas-bar,.nx-atlas-footer {display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 15px}
+.nx-atlas-viewname {font:600 11px/1.3 ui-monospace,Consolas,monospace;letter-spacing:.09em;text-transform:uppercase;color:#ccdbbc}
+.nx-atlas .nx-atlas-tabs {display:inline-flex;gap:1px;background:#10322c;border:1px solid #597b69;border-radius:7px;padding:2px}
+.nx-atlas .nx-atlas-tabs button {border:0;box-shadow:none;min-height:28px;min-width:34px;padding:3px 7px;color:#d0dfcf;background:transparent;border-radius:4px;font:600 12px ui-monospace,Consolas,monospace;cursor:pointer}
+.nx-atlas .nx-atlas-tabs button[aria-pressed=true] {background:#dfebd6;color:#183f35}
+.nx-atlas-stage {position:relative;display:grid;align-items:center;min-width:0;flex:1}
+.nx-atlas-whole,.nx-atlas-section {display:block;width:100%;height:auto;max-height:470px;margin:auto}
+.nx-atlas-stage.is-section {min-height:clamp(240px,31vw,385px);padding-bottom:42px;box-sizing:border-box}
+.nx-atlas-section .nx-atlas-leader text {font-size:13.5px}
+.nx-atlas .nx-atlas-locator {background:#16382fe8;border:1px solid #749581;border-radius:7px;position:absolute;bottom:5px;right:12px;display:flex;align-items:center;gap:4px;padding:3px 7px 3px 4px;color:#e4efdc;cursor:pointer;min-height:40px}
+.nx-atlas-locator svg {height:37px;width:20px}
+.nx-atlas-locator span,.nx-atlas-footer label>span {font:600 11px/1.4 system-ui,sans-serif}
+.nx-atlas .nx-atlas-footer {background:#13362e;border-top:1px solid #456951;flex-wrap:wrap;align-items:flex-end;gap:9px}
+.nx-atlas-footer label {display:flex;flex-direction:column;align-items:flex-start;gap:3px;color:#d4dfce}
+.nx-atlas .nx-atlas-footer select {box-sizing:border-box;max-width:100%;font:600 13px/1.3 system-ui,sans-serif;color:#edf1df;background:#264b3c;border:1px solid #7c9985;border-radius:5px;padding:6px 20px 6px 6px;min-height:33px}
+.nx-atlas-legend {display:flex;gap:8px;flex-wrap:wrap}
+.nx-atlas-legend span {display:inline-flex;align-items:center;gap:2px;color:#e4e8d5;font:500 11px/1.4 system-ui,sans-serif}
+.nx-atlas-legend svg {width:18px;height:15px}
+.nx-plate-link[role=button] {cursor:pointer;outline-offset:3px}
+.nx-plate-link.is-active .nx-atlas-leader path,.nx-plate-link:hover .nx-atlas-leader path,.nx-plate-link:focus-visible .nx-atlas-leader path {stroke:#ffe3a1;stroke-width:2;opacity:1}
+.nx-atlas :is(button,select,input,[tabindex]):focus-visible {outline:3px solid #ffdc88;outline-offset:2px}
+.nx-mesh {position:relative;min-width:0;text-align:center}
+.nx-mesh-viewport {position:relative;width:100%;max-width:472px;margin:auto}
+.nx-mesh-viewport canvas {display:block;width:100%;height:auto}
+.nx-mesh-viewport svg {position:absolute;inset:0;height:100%;max-height:none}
+.nx-mesh svg {display:block;width:100%;height:auto;max-height:400px;touch-action:pan-y;cursor:grab;user-select:none}
+.nx-mesh svg:active {cursor:grabbing}
+.nx-mesh-controls {display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;font:600 11px/1.4 system-ui,sans-serif;color:#d7e4d2;padding:5px}
+.nx-mesh-controls input {width:105px;max-width:40%;accent-color:#b7d5ac}
+@media(max-width:480px){.nx-atlas-bar,.nx-atlas-footer{padding:9px 11px}.nx-atlas-legend{gap:5px}.nx-atlas .nx-atlas-whole .nx-atlas-leader text{font-size:15px}.nx-atlas-section .nx-atlas-leader text{font-size:15px}}
