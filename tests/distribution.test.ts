@@ -1,0 +1,5 @@
+import {solveDistribution,distributionDefaults} from '../src/engine/distribution';
+test('distribution preserves amount and nonnegative states',()=>{const rows=solveDistribution(distributionDefaults);expect(rows[0].gut).toBe(100);for(const r of rows){expect(Math.abs(r.gut+r.central+r.tissue+r.removed-100)).toBeLessThan(1e-9);expect(Math.min(r.gut,r.central,r.tissue,r.removed)).toBeGreaterThanOrEqual(0)}});
+test('no absorption leaves all drug at absorption site',()=>{const r=solveDistribution({...distributionDefaults,ka:0}).at(-1)!;expect(r.gut).toBe(100);expect(r.central+r.tissue+r.removed).toBe(0)});
+test('absorption agrees with exponential analytical solution',()=>{const rows=solveDistribution(distributionDefaults);for(const r of rows)expect(Math.abs(r.gut-100*Math.exp(-r.time))).toBeLessThan(1e-7)});
+test('invalid parameters fail and fractional endpoint is exact',()=>{expect(()=>solveDistribution({...distributionDefaults,dose:NaN})).toThrow();expect(solveDistribution({...distributionDefaults,duration:.35}).at(-1)!.time).toBe(.35)});

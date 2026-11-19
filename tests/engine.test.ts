@@ -54,6 +54,21 @@ describe('numerical methods and convergence', () => {
     expect(rmseAt(solvePK_RK4, .1)).toBeLessThan(rmseAt(solvePK_RK4, .5));
     expect(rmseAt(solvePK_RK4, .5)).toBeLessThan(rmseAt(solvePK_Euler, .5));
   });
+  test('Euler rejects steps which empty or reverse a compartment in one update', () => {
+    expect(() => solvePK_Euler({ dose: 100, V: 10, ke: .5 }, 4, 2)).toThrow(/below 2.000 h/);
+    expect(() => solvePK_Euler(p, 10, 1)).toThrow(/Euler/);
+    expect(solvePK_Euler(p, .25, 1).C.every(c => c >= 0)).toBe(true);
+  });
+  test('slow absorption and rapid elimination still give a finite analytical tail', () => {
+    const c = solvePK_Exact({ dose: 10, V: 1, ke: 10, ka: .01 }, 100, 100).C[1];
+    expect(c).toBeCloseTo(10000 * .01 / 9.99 * Math.exp(-1), 10);
+  });
+  test('fractional repeat events are inserted once in both solvers', () => {
+    const settings = { dose: 10, V: 2, ke: .2, numberOfDoses: 4, dosingInterval: .1 };
+    const exact = solvePK_Exact(settings, .5, .1), numerical = solvePK_RK4(settings, .5, .1);
+    expect(numerical.time).toEqual([0, .1, .2, .3, .4, .5]);
+    expect(calculateRMSE(exact.C, numerical.C)).toBeLessThan(.0001);
+  });
   test('Emax response is zero at zero concentration and half-max at EC50', () => {
     expect(calculatePD_Emax([0, 10], 100, 10)).toEqual([0, 50]);
   });

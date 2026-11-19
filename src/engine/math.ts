@@ -30,18 +30,23 @@ function timeGrid(duration: number, step: number, events: number[] = []): number
   events.filter(t => t > 0 && t <= duration).forEach(t => values.add(t));
   return [...values].sort((a, b) => a - b);
 }
-const doseTimes = (p: PKParams) => Array.from({ length: p.numberOfDoses ?? 1 }, (_, i) => i * (p.dosingInterval ?? 0));
+const doseTimes = (p: PKParams) => Array.from({ length: p.numberOfDoses ?? 1 }, (_, i) => Number((i * (p.dosingInterval ?? 0)).toPrecision(14)));
 function singleDoseConcentration(p: PKParams, elapsed: number): number {
   if (p.ka === undefined) return 1000 * p.dose / p.V * Math.exp(-p.ke * elapsed);
-  const delta = p.ka - p.ke;
+  const rateGap = Math.abs(p.ka - p.ke);
   const scale = 1000 * (p.F ?? 1) * p.dose / p.V;
-  if (Math.abs(delta) < 1e-7 * Math.max(p.ka, p.ke)) return scale * p.ka * elapsed * Math.exp(-p.ke * elapsed);
-  return scale * p.ka * Math.exp(-p.ke * elapsed) * (-Math.expm1(-delta * elapsed)) / delta;
+  if (rateGap === 0) return scale * (p.ka * elapsed) * Math.exp(-p.ke * elapsed);
+  return scale * p.ka * Math.exp(-Math.min(p.ka, p.ke) * elapsed) * (-Math.expm1(-rateGap * elapsed)) / rateGap;
+}
+export function exactPKAtTimes(p: PKParams, time: number[]): number[] {
+  const v = validateParameters(p); if (!v.valid) throw new Error(v.message);
+  const events = doseTimes(p);
+  return time.map(t => events.reduce((sum, td) => td <= t ? sum + singleDoseConcentration(p, t - td) : sum, 0));
 }
 export function solvePK_Exact(p: PKParams, duration: number, step: number): SolverResult {
   const v = validateParameters(p); if (!v.valid) throw new Error(v.message);
-  const events = doseTimes(p); const time = timeGrid(duration, step, events);
-  return { time, C: time.map(t => events.reduce((sum, td) => td <= t ? sum + singleDoseConcentration(p, t - td) : sum, 0)) };
+  const time = timeGrid(duration, step, doseTimes(p));
+  return { time, C: exactPKAtTimes(p,time) };
 }
 
 type PKState = { Ag: number; C: number };
@@ -60,9 +65,18 @@ export function solveNumerical(p: PKParams, duration: number, step: number, meth
   const events = doseTimes(p); const time = timeGrid(duration, step, events);
   let state: PKState = p.ka === undefined ? { Ag: 0, C: 1000 * p.dose / p.V } : { Ag: p.dose, C: 0 };
   const C = [state.C];
+  const repeatEvents = new Set(events.slice(1));
+  const fastestRate = Math.max(p.ke, p.ka ?? 0);
   for (let i = 1; i < time.length; i++) {
-    state = pkAdvance(state, time[i] - time[i - 1], p, method);
-    if (events.slice(1).some(td => Math.abs(td - time[i]) < 1e-12)) {
+    const interval = time[i] - time[i - 1];
+    if (method === 'euler' && interval * fastestRate >= 1) {
+      throw new Error(`Euler would empty or reverse a compartment in one step. Choose a step below ${(1 / fastestRate).toPrecision(4)} h, then compare errors under refinement.`);
+    }
+    state = pkAdvance(state, interval, p, method);
+    if (!Number.isFinite(state.Ag) || !Number.isFinite(state.C) || state.Ag < 0 || state.C < 0) {
+      throw new Error(`${method.toUpperCase()} left the finite, non-negative range. Reduce the time step.`);
+    }
+    if (repeatEvents.has(time[i])) {
       if (p.ka === undefined) state.C += 1000 * p.dose / p.V;
       else state.Ag += p.dose;
     }
